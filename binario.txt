@@ -1,0 +1,239 @@
+INIT_LOOP:  
+load_size: 00011000					#MOV ACC, CTE
+		       //00000111					#SIZE
+           10010110         #Donde esta ubicado SIZE
+	         00101000					#MOV DPTR, ACC
+	         00100000					#Guarda SIZE en ACC (MOV ACC, [DPTR])
+	         01110000					#CALL DIR
+		       00001000					#neg_size
+	         01110000					#CALL DIR
+		       00001001					#load_it
+	  	     01001000					#ADD ACC, A	
+	  	   
+loop_test: 01100000					#JN CTE
+		       00001010					#BOOTH_ADD. if(Cuenta < SIZE). Iteracion
+	         01010000					#JMP CTE
+		       00010011					#END_LOOP. Fin del for
+	       
+BOOTH_ADD: 01110000					#CALL DIR
+		       00010100					#llsb_constant
+           01110000					#CALL DIR
+		       00001011					#charge_q			
+	       
+lsb_q:     10101000					#LLSB ACC, A. Q0 en ACC
+		       00010000					#MOV A, ACC. Q0 en A
+		       01110000					#CALL DIR
+		       00001100					#charge_b			
+            
+xor_qyb:    10000000				#XOR ACC, A. XOR entre A y ACC y lo guarda en ACC
+
+if_xor:     01011000				#JZ CTE 
+			      00001110        #SHIFT_A. if(11 || 00) (shifyt)
+            01010000				#JMP CTE MODIF_A. 
+            00001101
+            
+MODIF_A:   
+lsb_qcm:    01110000			  #CALL DIR
+		        00010100			  #llsb_constant
+            01110000				#CALL DIR					
+			      00001011				#charge_q	= Q en ACC
+            10101000				#LLSB ACC,A = Q0 (bit menos significativo) en ACC
+cmharge_b:  01110000				#CALL DIR
+			      00001100				#charge_b	= Q-1 en ACC
+
+neg_q-1:    10100000        #NEG ACC   -(Q-1)
+     
+cond_10:	01001000				#ADD ACC, A			
+          01100000				#JN CTE
+			    00001111				#ADD_SUM. if(01)
+			
+SUB_NEG:  01110000				#CALL DIR
+			    00010001				#charge_m. M en A
+			    00001000				#MOV ACC, A. M en ACC
+
+neg_m:		01110000				#CALL DIR
+			    00001000				#neg_size. -M en A
+
+char_a:	  01110000				#CALL DIR
+			    00010001				#charge_a. A en ACC
+
+neg_am:		01001000				#ADD ACC, A. A-M       
+          00110000				#MOV [DPTR], ACC. Guarda A-M  
+          01010000				#JMP					
+			    00001110				#SHIFT_A 
+
+ADD_SUM:	01110000				#CALL DIR
+			    00010000				#charge_m
+			    01110000				#CALL DIR
+			    00010001				#charge_a
+			
+sum_am:		01001000				#ADD ACC, A. A+M
+			    00110000				#MOV [DPTR], ACC. Guarda A+M donde estaba A
+			           
+SHIFT_A:	01110000				#CALL DIR
+          00010101        #mlsb_constant
+          01110000				#CALL DIR
+			    00001011				#charge_q. Valor de Q en ACC
+
+minsig_b: 10001000				#MLSB ACC, A. menos sig de Q
+			    00010000				#MOV A, ACC
+			    00011000				#MOV ACC, CTE
+			    00000010				#B
+			    00101000				#MOV DPTR, ACC
+			    00001000        #MOV ACC, A
+			    00101000				#MOV [DPTR], ACC. Guarda Q-1 EN B
+			
+minsig_q: 01110000				#CALL DIR
+          00010101
+          01110000				#CALL DIR
+			    00010001				#charge_a. A en ACC
+			    10001000        #MLSB ACC. menos sig A
+			    00010000				#MOV A, ACC. menos sig de A en A
+			
+shift_q:	01110000				#CALL DIR
+			    00001011				#charge_q. Q en ACC
+			    10011000				#RSHIFT ACC, A. shift a la derecha de Q
+			    00110000				#MOV [DPTR], ACC. guarda shift en Q
+			
+msb_a:		00011000				#MOV ACC, CTE
+			    10000000				#10000000
+          00010000				#MOV A, ACC. menos sig de A en A
+          01110000				#CALL DIR
+			    00010001				#charge_a. A en ACC
+			    10010000				#MSB ACC. mas significativo de A
+			    00010000				#MOV A, ACC. A en A
+			
+shift_a:	01110000				#CALL DIR
+			    00010001				#charge_a. A en ACC
+			    10011000				#RSHIFT ACC, A. Shift aritmetico de A
+			    00110000				#MOV [DPTR], ACC. Lo guarda en A
+			
+inc_it:   01110000				#CALL DIR
+			    00001001				#load_it. Cuenta en ACC
+          00010000				#MOV A, ACC. Cuenta en A
+          00011000				#MOV ACC, CTE 0X01. número 1 en ACC
+          00000001
+          01001000				#ADD ACC, A. Incrementar iterador
+          00110000				#MOV [DPTR], ACC. Guarda el nuevo valor del iterador en cuenta
+
+next_it:  01010000				#JMP CTE
+			    00010010				#INIT_LOOP
+END_LOOP: 01110000				#CALL DIR
+			    00010001				#charge_a. A en ACC
+          00010000				#MOV A, ACC. A en A
+          01110000				#CALL DIR
+			    00001011				#charge_q. Q en ACC
+          11111000        #HALT
+
+funciones:
+neg_size:   00111000					#INV ACC
+            00010000					#MOV A, ACC
+            00011000					#MOV ACC, CTE 0X01
+            01001000					#ADD ACC, A
+            00010000					#MOV A, ACC. Guarda -SIZE en A
+            01111000					#RET
+  
+load_ it:   00011000					#MOV ACC, CTE
+		        //00000110					#Cuenta
+            10010101          #Donde esta ubicado Cuenta en binario 0b
+	  	      00101000					#MOV DPTR, ACC
+	  	      00100000					#MOV ACC, [DPTR]. Guarda Cuenta en ACC
+	  	      01111000					#RET       
+  
+charge_q:   00011000					#MOV ACC, CTE			
+		        //00000000					#Q
+            10010001          #Donde esta ubicado Q en binario 0b
+	          00110000					#MOV DPTR, ACC
+	          00100000					#MOV ACC, [DPTR]. Guarda Q en ACC
+	          01111000					#RET	
+		   	   
+charge_b:   00011000				#MOV ACC, CTE
+			      //00000010				#B
+            10010011        #Donde esta ubicado B en binario 0b
+            00101000				#MOV DPTR, ACC	
+            00100000 				#MOV ACC, [DPTR]. Q-1 en ACC
+            01111000				#RET
+            
+charge_m:   00011000				#MOV ACC, CTE
+			      //00000010				#M. if(01)
+            10010100        #Donde esta ubicado M en binario 0b
+			      00101000				#MOV DPTR, ACC
+			      00100000				#MOV ACC, [DPTR]. Guarda M en ACC
+			      01111000				#RET
+			      00010000				#MOV A, ACC. M en A
+            01111000				#RET
+
+charge_a:  	00010000				#MOV ACC, CTE
+			      //00000001				#A
+            10010010        #Donde esta ubicado A en binario 0b
+			      00101000				#MOV DPTR, ACC. DPTR posición de memoria de A
+			      00100000				#MOV ACC, [DPTR]. Guarda A en ACC		
+			      01111000				#RET
+mlsb_constant:	
+			      00011000				#MOV ACC, CTE
+		        10000001				#0X81						#10000001 en ACC
+		        00010000				#MOV A, ACC	
+            01111000				#RET
+llsb_constant: 
+            00011000				#MOV ACC, CTE
+		        00000001				#0X81						#00000001 en ACC
+		        00010000				#MOV A, ACC	
+            01111000				#RET
+
+Valores
+Q: 			Dir de memoria: 0	-> 0x00		#Multiplicador
+A: 			Dir de memoria: 1	-> 0x00			#Resultado
+B: 			Dir de memoria: 2	-> 0x00			#Bit del shift q-1
+M: 			Dir de memoria: 3	-> 0x00		    #Multiplicando
+PByte: 		Dir de memoria: 4	-> 0x00		#Registro uno del resultado
+SByte: 		Dir de memoria: 5	-> 0x00		#Registro dos del resultado
+Cuenta: 	Dir de memoria: 6	-> 0x00	#Cuenta de cuantas veces se ha hecho
+SIZE:       Dir de memoria: 7	-> 0X08		#Cantidad de bits para hacer el for de la multiplicación
+neg_size:   Dir de memoria: 8 #Niega algun valor
+load_it:    Dir de memoria: 9 #Carga el iterador
+BOOTH_ADD:  Dir de memoria: 10 #Algoritmo de booth
+charge_q:	Dir de memoria: 11 #Carga Q
+charge_b:	Dir de memoria: 12 #Carga B(Q-1)
+MODIF_A:	Dir de memoria: 13 #Suma o resta A con M según los bits de Q0 y Q-1
+SHIFT_A:	Dir de memoria: 14 #Hace un shift aritmetico a la derecha de A, Q y Q-1
+ADD_SUM:	Dir de memoria: 15 #Hace una suma entre A y M
+charge_m:	Dir de memoria: 16 #Carga M
+charge_a:	Dir de memoria: 17 #Carga A
+INIT_LOOP:  Dir de memoria: 18 #Inicio del for
+END_LOOP:	Dir de memoria: 19 #fin del for
+llsb_constant Dir de memoria: 20 #Cargar la constante para hacer LLSB
+mlsb_constant Dir de memoria: 21 #Cargar la constante para hacer MLSB  
+# Si un numero es negativo se tiene que dar en two's  complement 
+
+Instrucciones nuevas:
+XOR: Un or exclusivo que solo ponga 1 si 1, 0 o 0, 1. Guarda el valor en el registro ACC.
+10000xxx XOR ACC, A 1 byte Lanza una bandera de 1 o 0
+MLSB: Accede al bit menos significativo de un registro binario de 8 bits, guardándolo en el registro que se haya pasado a la instrucción.
+10001xxx LSB ACC 1 byte No lanza banderas
+LLSB: (00000001) Accede al menos significativo, guardandolo en el ACC
+10101xxx LLSB ACC, A No lanza banderas
+MSB: Accede al bit más significativo de un registro binario de 8 bits, guardándolo en el registro que se haya pasado a la instrucción.
+10010xxx LSB ACC 1 byte No lanza banderas
+RSHIFT: hace un shift aritmético a la derecha del primer registro y el segundo es el valor que indica el shift arítmetico y lo guarda en el registro ACC.
+10011xxx RSHIFT ACC, A  1 byte no lanza banderas
+NEG: twos complement :D
+10100xxx NEG ACC no lanza banderas
+
+Instrucciones en circuitverse:
+
+XOR:
+11000001111110000001111000000 //XOR
+RSHIFT:
+00000111111110000001111000000 //shift a la derecha
+01010001111110000001111000000 //suma a y acc
+MLSB:
+00101001111110000001111000000 // A And B con shift a la izquierda
+00000111111110000001111000000 //B con shift a la derecha
+00010011111110000001111000000 //Invertir
+00100001111110000001111000000 //A And B
+LLSB:
+00100001111110000001111000000 //A and B
+MSB:
+00100001111110000001111000000 //A and B
+NEG
+01110011111110000001111000000 //-B
