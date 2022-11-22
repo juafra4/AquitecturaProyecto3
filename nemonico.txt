@@ -4,9 +4,9 @@ load_size: MOV ACC, CTE
 	         MOV DPTR, ACC
 	         MOV ACC, [DPTR]			#Guarda SIZE en ACC 
 	         CALL DIR					    #Llamar subrutina
-		       neg_size
+		     neg_size
 	         CALL DIR
-		       load_it
+		     load_it
 	  	     ADD ACC, A	
 	  	   
 loop_test: JN CTE					      #if(Cuenta < SIZE)
