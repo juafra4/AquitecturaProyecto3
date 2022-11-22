@@ -1,3 +1,5 @@
+Integrantes: Julian Gonzalez Sierra y Juanita Franco Sanchez
+
 INIT_LOOP:
 load_size: MOV ACC, CTE
 	         SIZE
