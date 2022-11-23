@@ -29,9 +29,9 @@ lsb_q:      10101000					#LLSB ACC, A. Q0 en ACC
             
 xor_qyb:    10000000				    #XOR ACC, A. XOR entre A y ACC y lo guarda en ACC
 
-if_xor:     01011000				    #JZ CTE
+if_xor:     01011000                    #JZ CTE
             00001110                    #SHIFT_A. if(11 || 00) (shifyt)
-            01010000				    #JMP CTE MODIF_A.
+            01010000                    #JMP CTE MODIF_A.
             00001101
             
 MODIF_A:   
@@ -54,7 +54,7 @@ SUB_NEG:    01110000				    #CALL DIR
             00010001				    #charge_m. M en A
             00001000				    #MOV ACC, A. M en ACC
 
-neg_m:		01110000				    #CALL DIR
+neg_m:      01110000				    #CALL DIR
             00001000				    #neg_size. -M en A
 
 char_a:	    01110000				    #CALL DIR
@@ -65,18 +65,18 @@ neg_am:		01001000				    #ADD ACC, A. A-M
             01010000				    #JMP
             00001110				    #SHIFT_A 
 
-ADD_SUM:	01110000				    #CALL DIR
+ADD_SUM:    01110000				    #CALL DIR
             00010000				    #charge_m
             01110000				    #CALL DIR
             00010001				    #charge_a
 			
-sum_am:		01001000				    #ADD ACC, A. A+M
+sum_am:     01001000				    #ADD ACC, A. A+M
             00110000				    #MOV [DPTR], ACC. Guarda A+M donde estaba A
 			           
-SHIFT_A:	01110000				    #CALL DIR
+SHIFT_A:    01110000				    #CALL DIR
             00010101                    #mlbs_constant
             01110000				    #CALL DIR
-		    00001011				    #charge_q. Valor de Q en ACC
+            00001011				    #charge_q. Valor de Q en ACC
 
 minsig_b:   10001000				    #MLSB ACC, A. menos sig de Q
             00010000				    #MOV A, ACC
@@ -93,12 +93,12 @@ minsig_q:   01110000				    #CALL DIR
             10001000                    #MLSB ACC. menos sig A
             00010000				    #MOV A, ACC. menos sig de A en A
 			
-shift_q:	01110000				    #CALL DIR
+shift_q:    01110000				    #CALL DIR
             00001011				    #charge_q. Q en ACC
             10011000				    #RSHIFT ACC, A. shift a la derecha de Q
             00110000				    #MOV [DPTR], ACC. guarda shift en Q
 			
-msb_a:		00011000				    #MOV ACC, CTE
+msb_a:      00011000				    #MOV ACC, CTE
             10000000				    #10000000
             00010000				    #MOV A, ACC. menos sig de A en A
             01110000				    #CALL Dir
@@ -106,7 +106,7 @@ msb_a:		00011000				    #MOV ACC, CTE
             10010000				    #MSB ACC. mas significativo de A
             00010000				    #MOV A, ACC. A en A
 			
-shift_a:	01110000				    #CALL DIR
+shift_a:    01110000				    #CALL DIR
             00010001				    #charge_a. A en ACC
             10011000				    #RSHIFT ACC, A. Shift aritmetico de A
             00110000				    #MOV [DPTR], ACC. Lo guarda en A
@@ -174,8 +174,8 @@ charge_a:   00010000				    #MOV ACC, CTE
             00100000				    #MOV ACC, [DPTR]. Guarda A en ACC
             01111000				    #RET
 
-mlsb_constant:	
-			00011000				    #MOV ACC, CTE
+mlsb_constant:
+            00011000				    #MOV ACC, CTE
             10000001				    #0X81			#10000001 en ACC
             00010000				    #MOV A, ACC	
             01111000				    #RET
