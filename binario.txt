@@ -126,30 +126,30 @@ END_LOOP:   01110000				    #CALL DIR
             00010001				    #charge_a. A en ACC
             00010000				    #MOV A, ACC. A en A
             01110000				    #CALL DIR
-            00001011				    #charge_q. Q en ACC
+            00001011                    #charge_q. Q en ACC
             11111000                    #HALT
 
 funciones:
-neg_size:   00111000					#INV ACC
-            00010000					#MOV A, ACC
-            00011000					#MOV ACC, CTE 0X01
-            01001000					#ADD ACC, A
-            00010000					#MOV A, ACC. Guarda -SIZE en A
-            01111000					#RET
+neg_size:   00111000				    #INV ACC
+            00010000				    #MOV A, ACC
+            00011000				    #MOV ACC, CTE 0X01
+            01001000				    #ADD ACC, A
+            00010000				    #MOV A, ACC. Guarda -SIZE en A
+            01111000				    #RET
   
-load_ it:   00011000					#MOV ACC, CTE
-            //00000110					#Cuenta
+load_ it:   00011000			        #MOV ACC, CTE
+            //00000110			        #Cuenta
             10010101                    #Donde esta ubicado Cuenta en binario 0b
-            00101000					#MOV DPTR, ACC
-            00100000					#MOV ACC, [DPTR]. Guarda Cuenta en ACC
-            01111000					#RET       
+            00101000			    	#MOV DPTR, ACC
+            00100000			    	#MOV ACC, [DPTR]. Guarda Cuenta en ACC
+            01111000			    	#RET       
   
-charge_q:   00011000					#MOV ACC, CTE
-            //00000000					#Q
+charge_q:   00011000			    	#MOV ACC, CTE
+            //00000000			    	#Q
             10010001                    #Donde esta ubicado Q en binario 0b
-            00110000					#MOV DPTR, ACC
-            00100000					#MOV ACC, [DPTR]. Guarda Q en ACC
-            01111000					#RET
+            00110000			    	#MOV DPTR, ACC
+            00100000			    	#MOV ACC, [DPTR]. Guarda Q en ACC
+            01111000			    	#RET
 		   	   
 charge_b:   00011000				    #MOV ACC, CTE
             //00000010				    #B
@@ -167,7 +167,7 @@ charge_m:   00011000				    #MOV ACC, CTE
             00010000				    #MOV A, ACC. M en A
             01111000				    #RET
 
-charge_a:  	00010000				    #MOV ACC, CTE
+charge_a:   00010000				    #MOV ACC, CTE
             //00000001				    #A
             10010010                    #Donde esta ubicado A en binario 0b
             00101000				    #MOV DPTR, ACC. DPTR posición de memoria de A
