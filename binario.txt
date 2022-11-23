@@ -2,8 +2,8 @@ Integrantes: Julian Gonzalez Sierra y Juanita Franco Sanchez
 
 INIT_LOOP:  
 load_size:  00011000					#MOV ACC, CTE
-            //00000111				#SIZE
-            10010110                 #Donde esta ubicado SIZE
+            //00000111                  #SIZE
+            10010110                    #Donde esta ubicado SIZE
             00101000					#MOV DPTR, ACC
             00100000					#Guarda SIZE en ACC (MOV ACC, [DPTR])
             01110000					#CALL DIR
