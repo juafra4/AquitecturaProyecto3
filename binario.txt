@@ -29,33 +29,33 @@ lsb_q:      10101000					#LLSB ACC, A. Q0 en ACC
             
 xor_qyb:    10000000				    #XOR ACC, A. XOR entre A y ACC y lo guarda en ACC
 
-if_xor:    01011000				    #JZ CTE 
-		   00001110                 #SHIFT_A. if(11 || 00) (shifyt)
-           01010000				    #JMP CTE MODIF_A. 
-           00001101
+if_xor:     01011000				    #JZ CTE
+            00001110                    #SHIFT_A. if(11 || 00) (shifyt)
+            01010000				    #JMP CTE MODIF_A.
+            00001101
             
 MODIF_A:   
-lsb_qcm:   01110000			        #CALL DIR
-		   00010100			        #llsb_constant
-           01110000				    #CALL DIR					
-		   00001011				    #charge_q	= Q en ACC
-           10101000				    #LLSB ACC,A = Q0 (bit menos significativo) en ACC
+lsb_qcm:    01110000			        #CALL DIR
+            00010100			        #llsb_constant
+            01110000				    #CALL DIR
+            00001011				    #charge_q	= Q en ACC
+            10101000				    #LLSB ACC,A = Q0 (bit menos significativo) en ACC
 
-cmharge_b: 01110000				    #CALL DIR
-		   00001100				    #charge_b	= Q-1 en ACC
+cmharge_b:  01110000				    #CALL DIR
+            00001100				    #charge_b	= Q-1 en ACC
 
-neg_q-1:    10100000        #NEG ACC   -(Q-1)
+neg_q-1:    10100000                    #NEG ACC   -(Q-1)
      
-cond_10:	01001000				#ADD ACC, A			
-          01100000				#JN CTE
-			    00001111				#ADD_SUM. if(01)
+cond_10:	01001000				    #ADD ACC, A
+            01100000				    #JN CTE
+            00001111				    #ADD_SUM. if(01)
 			
-SUB_NEG:  01110000				#CALL DIR
-			    00010001				#charge_m. M en A
-			    00001000				#MOV ACC, A. M en ACC
+SUB_NEG:    01110000				    #CALL DIR
+            00010001				    #charge_m. M en A
+            00001000				    #MOV ACC, A. M en ACC
 
-neg_m:		01110000				#CALL DIR
-			    00001000				#neg_size. -M en A
+neg_m:		01110000				    #CALL DIR
+            00001000				    #neg_size. -M en A
 
 char_a:	  01110000				#CALL DIR
 			    00010001				#charge_a. A en ACC
