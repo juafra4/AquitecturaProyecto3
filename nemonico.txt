@@ -1,23 +1,24 @@
 Integrantes: Julian Gonzalez Sierra y Juanita Franco Sanchez
+
 INIT_LOOP:
 load_size:  MOV ACC, CTE        
-            SIZE
-	        MOV DPTR, ACC
-	        MOV ACC, [DPTR]			  #Guarda SIZE en ACC  
-            NEG ACC                   #Niega SIZE
+			SIZE
+			MOV DPTR, ACC
+			MOV ACC, [DPTR]				#Guarda SIZE en ACC  
+            NEG ACC						#Niega SIZE
             MOV A, ACC
 load_it: 	MOV ACC, CTE
             Cuenta
             MOV DPTR, ACC
-	        MOV ACC, [DPTR]			  #Guarda Cuenta en ACC
-	  	    ADD ACC, A
-loop_test:  JN CTE					  #if(Cuenta < SIZE)
-	        BOOTH_ADD				  #Iteracion
-	        JMP CTE
-	        END_LOOP	                #Fin del for
+			MOV ACC, [DPTR]				#Guarda Cuenta en ACC
+			ADD ACC, A
+loop_test:	JN CTE						#if(Cuenta < SIZE)
+			BOOTH_ADD					#Iteracion
+			JMP CTE
+			END_LOOP					#Fin del for
 
 BOOTH_ADD:  MOV ACC, CTE
-            0X01						      #00000001 en ACC
+            0X01						#00000001 en ACC
             MFMOV A, ACC
 charge_q:   MOV ACC, CTE
 		        Q
