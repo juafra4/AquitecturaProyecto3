@@ -1,12 +1,12 @@
 Integrantes: Julian Gonzalez Sierra y Juanita Franco Sanchez
 
 INIT_LOOP:
-load_size:  MOV ACC, CTE        
+load_size:  MOV ACC, CTE
 			SIZE
 			MOV DPTR, ACC
-			MOV ACC, [DPTR]				#Guarda SIZE en ACC  
-            NEG ACC						#Niega SIZE
-            MOV A, ACC
+			MOV ACC, [DPTR]				#Guarda SIZE en ACC
+			NEG ACC						#Niega SIZE
+			MOV A, ACC
 load_it: 	MOV ACC, CTE
             Cuenta
             MOV DPTR, ACC
