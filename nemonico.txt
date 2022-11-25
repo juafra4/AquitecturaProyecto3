@@ -1,183 +1,160 @@
 Integrantes: Julian Gonzalez Sierra y Juanita Franco Sanchez
-
 INIT_LOOP:
-load_size: MOV ACC, CTE
-	         SIZE
-	         MOV DPTR, ACC
-	         MOV ACC, [DPTR]			#Guarda SIZE en ACC 
-	         CALL DIR					    #Llamar subrutina
-		     neg_size
-	         CALL DIR
-		     load_it
-	  	     ADD ACC, A	
-	  	   
-loop_test: JN CTE					      #if(Cuenta < SIZE)
-	         BOOTH_ADD				    #Iteracion
-	         JMP CTE
-	         END_LOOP					    #Fin del for
-	       
-BOOTH_ADD: CALL DIR
-		       llsb_constant				  #Se carga en A la constante 00000001
-		       CALL DIR
-		       charge_q			
-	       
-lsb_q:     LLSB ACC, A				  #Q0 en ACC
-		       MOV A, ACC				    #Q0 en A
-    		   CALL DIR
-    		   charge_b			
-            
-xor_qyb:   XOR ACC, A				    #XOR entre A y ACC y lo guarda en ACC
-
-if_xor:     JZ CTE 
-			      SHIFT_A				      #if(11 ||00) (shift)
-            JMP CTE 
-			      MODIF_A				      #hacer operaciones
-            
-MODIF_A:  
-lsb_qcm:    CALL DIR
-            llsb_constant			  #Se carga en A la constante 00000001
-			      CALL DIR
-			      charge_q				    # = Q en ACC
-            LLSB ACC, A				  # = Q0 (bit menos significativo) en ACC
+load_size:  MOV ACC, CTE        
+            SIZE
+	        MOV DPTR, ACC
+	        MOV ACC, [DPTR]			  #Guarda SIZE en ACC  
+            NEG ACC                   #Niega SIZE
             MOV A, ACC
-			      
-cmharge_b:  CALL DIR 
-      			charge_b				    # = Q-1 en ACC
+load_it: 	MOV ACC, CTE
+            Cuenta
+            MOV DPTR, ACC
+	        MOV ACC, [DPTR]			  #Guarda Cuenta en ACC
+	  	    ADD ACC, A
+loop_test:  JN CTE					  #if(Cuenta < SIZE)
+	        BOOTH_ADD				  #Iteracion
+	        JMP CTE
+	        END_LOOP	                #Fin del for
 
-neg_q-1:    NEG ACC				      # = -(Q-1) en ACC
- 			
-cond_10:	  ADD ACC, A			
-            JN	CTE					      #if(01)
-			      ADD_SUM
+BOOTH_ADD:  MOV ACC, CTE
+            0X01						      #00000001 en ACC
+            MFMOV A, ACC
+charge_q:   MOV ACC, CTE
+		        Q
+	          MOV DPTR, ACC
+	          MOV ACC, [DPTR]			  #Guarda Q en ACC	
+lsb_q:      LLSB ACC, A				    #Q0 en ACC
+		        MFMOV A, ACC				  #Q0 en A 
+charge_b:   MOV ACC, CTE
+            B
+            MOV DPTR, ACC	
+            MOV ACC, [DPTR]		    #Q-1 en ACC        
+xor_qyb:    XOR ACC, A				    #XOR entre A y ACC y lo guarda en ACC
+if_xor:     JZ CTE                #if(10 ||01)
+            MODIF_A	
 
-SUB_NEG:    CALL DIR
-			      charge_m			        #M en A
-			      MOV ACC, A					  #M en ACC
-
-neg_m:		  CALL DIR
-			      neg_size			    	  #-M en A
-
-char_a:	    CALL DIR
-			      charge_a					    #A en ACC
-
-neg_am:		  ADD ACC, A      			#A-M       
-            MOV [DPTR], ACC				#Guarda A-M  
-            JMP SHIFT_A
-			
-ADD_SUM:	  CALL DIR
-			      charge_m              #M en A
-			      CALL DIR              #A en ACC
-			      charge_a
-			
-sum_am:		  ADD ACC, A				    #A+M
-			      MOV [DPTR], ACC			  #Guarda A+M donde estaba A
-			       
-SHIFT_A:	  CALL DIR
-			      mlbs_constant			   #Guarda en A la constante 10000001
-            CALL DIR
-			      charge_q					   #Valor de Q en ACC
-
-minsig_b:   MLSB ACC, A					 #menos sig de Q
+SHIFT_A:	  
+llsb_constant: MOV ACC, CTE
+			      0X01						      #00000001 en ACC
+			      MOV A, ACC	
+charge_q:   MOV ACC, CTE
+		        Q
+	          MOV DPTR, ACC
+	          MOV ACC, [DPTR]			  #Guarda Q en ACC
+minsig_b:   LLSB ACC, A					  #menos sig de Q
 			      MOV A, ACC
-      			MOV ACC, CTE
+            MOV ACC, CTE
       			B
       			MOV DPTR, ACC
       			MOV ACC, A
-      			MOV [DPTR], ACC			#Guarda Q-1 EN B
-			
-minsig_q:   CALL DIR
-			      mlbs_constant			  #Guarda en A la constante 10000001
-      			CALL DIR
-      			charge_a					  #A en ACC
-      			MLSB ACC, A					#menos sig A
-      			MOV A, ACC					#menos sig de A en A
-			
-shift_q:	 CALL DIR
-			     charge_q					    #Q en ACC
-      	   RSHIFT ACC, A				#shift a la derecha de Q
-      	   MOV [DPTR], ACC			#guarda shift en Q
-			
-msb_a:     MOV ACC, CTE				#100000000 en ACC
-      		 0x80
-      	   MOV A, ACC
-      		 CALL DIR
-      		 charge_a					  #A en ACC
-      		 MSB ACC, A				  #más significativo de A
-      		 MOV A, ACC					#más signifiativo de A en A
-      			
-shift_a:	 CALL DIR
-			     charge_a					  #A en ACC
-    			 RSHIFT ACC, A			#Shift aritmetico de A
-    			 MOV [DPTR], ACC		#Lo guarda en A
-			
-inc_it:   CALL DIR
-			    load_it						  #Cuenta en ACC
-          MOV A, ACC					#Cuenta en A
-          MOV ACC, CTE				#número 1 en ACC
-          0X01
-          ADD ACC, A					#Incrementar iterador
-          MOV [DPTR], ACC			#Guarda el nuevo valor del iterador en cuenta
-
-next_it:  JMP CTE  
-	        INIT_LOOP
-END_LOOP: CALL DIR
-          charge_a
-          MOV A, ACC
-          CALL DIR
-          charge_q
-          HALT
-	
-funciones:
-neg_size:  INV ACC
-	       MOV A, ACC
-	       MOV ACC, CTE
-	       0X01
-	       ADD ACC, A
-	       MOV A, ACC				#Guarda -SIZE en A
-	       RET
-	       
-load_it: MOV ACC, CTE
-	  	   Cuenta
-	  	   MOV DPTR, ACC
-	  	   MOV ACC, [DPTR]			#Guarda Cuenta en ACC
-	  	   RET
-	  	   
-
-charge_q:  MOV ACC, CTE
-		       Q
-	         MOV DPTR, ACC
-	         MOV ACC, [DPTR]			#Guarda Q en ACC
-	         RET
-
-		   
+      			MOV [DPTR], ACC			  #Guarda Q-1 EN B	
+mlsb_constant: MOV ACC, CTE
+		        0X81						      #10000001 en ACC
+		        MOV A, ACC
+charge_a:   MOV ACC, CTE
+			      A
+			      MOV DPTR, ACC			    #DPTR posición de memoria de A
+			      MOV ACC, [DPTR]			  #Guarda A en ACC
+      			MLSB ACC, A					  #menos sig A
+      			MOV A, ACC					  #menos sig de A en A
+charge_q:   MOV ACC, CTE
+		        Q
+	          MOV DPTR, ACC
+	          MOV ACC, [DPTR]			  #Guarda Q en ACC
+      	    RSHIFT ACC, A				  #shift a la derecha de Q
+      	    MOV [DPTR], ACC			  #guarda shift en Q
+msb_a:      MOV ACC, CTE				  #100000000 en ACC
+      		  0x80
+      	    MOV A, ACC
+charge_a:   MOV ACC, CTE
+			      A
+			      MOV DPTR, ACC			    #DPTR posición de memoria de A
+			      MOV ACC, [DPTR]			  #Guarda A en ACC
+      		  MSB ACC, A				    #más significativo de A
+      		  MOV A, ACC					  #más signifiativo de A en A  
+charge_a:   MOV ACC, CTE
+			      A
+			      MOV DPTR, ACC			    #DPTR posición de memoria de A
+			      MOV ACC, [DPTR]			  #Guarda A en ACC
+            RSHIFT ACC, A			    #Shift aritmetico de A
+    			  MOV [DPTR], ACC		    #Lo guarda en A			
+            JMP CTE
+            INC_IT
+  
+MODIF_A:   
+llsb_constant: MOV ACC, CTE
+			      0X01						      #00000001 en ACC
+			      MOV A, ACC
+charge_q:   MOV ACC, CTE
+		        Q
+	          MOV DPTR, ACC
+	          MOV ACC, [DPTR]			  #Guarda Q en ACC
+            LLSB ACC, A				    # = Q0 (bit menos significativo) en ACC
+            MFMOV A, ACC 
 charge_b:   MOV ACC, CTE
             B
             MOV DPTR, ACC	
             MOV ACC, [DPTR]		    #Q-1 en ACC
-            RET
+neg_q-1:    NEG ACC				        # = -(Q-1) en ACC
+cond_10:	  ADD ACC, A			    
+            JN	CTE					      #if(01)
+			      ADD_SUM
 
-charge_m:   MOV ACC, CTE				#if(01)
+SUB_NEG:    
+charge_m:   MOV ACC, CTE
 			      M
 			      MOV DPTR, ACC
-			      MOV ACC, [DPTR] 		   #Guarda M en ACC
-			      RET
-			      MOV A, ACC				   #M en A
-			      RET
+			      MOV ACC, [DPTR] 		  #Guarda M en ACC
+neg_m:		  NEG ACC
+            MOV A, ACC
+charge_a:   MOV ACC, CTE
+			      A
+			      MOV DPTR, ACC			    #DPTR posición de memoria de A
+			      MOV ACC, [DPTR]			  #Guarda A en ACC
+neg_am:		  ADD ACC, A      			#A-M       
+            MOV [DPTR], ACC			  #Guarda A-M  
+            JMP CTE
+            SHIFT_A
+  
+ADD_SUM:	  
+charge_m:   MOV ACC, CTE				  #if(01)
+			      M
+			      MOV DPTR, ACC
+			      MOV ACC, [DPTR] 		  #Guarda M en ACC
+			      MOV A, ACC				    #M en A
 charge_a:	  MOV ACC, CTE
 			      A
-			      MOV DPTR, ACC			   #DPTR posición de memoria de A
-			      MOV ACC, [DPTR]			   #Guarda A en ACC		
-			      RET
-mlsb_constant:	
-			      MOV ACC, CTE
-		        0X81						#10000001 en ACC
-		        MOV A, ACC	
-            RET
-llsb_constant: 
-			      MOV ACC, CTE
-			      0X01						#00000001 en ACC
-			      MOV A, ACC		
-            RET
+			      MOV DPTR, ACC			    #DPTR posición de memoria de A
+			      MOV ACC, [DPTR]			  #Guarda A en ACC
+sum_am:		  ADD ACC, A				    #A+M
+			      MOV [DPTR], ACC			  #Guarda A+M donde estaba A     
+            JMP CTE
+            SHIFT_A
+  
+INC_IT:
+load_it: 	  MOV ACC, CTE
+            Cuenta
+            MOV DPTR, ACC
+	          MOV ACC, [DPTR]			  #Guarda Cuenta en ACC
+            MOV A, ACC					  #Cuenta en A
+            MOV ACC, CTE				  #número 1 en ACC
+            0X01
+            ADD ACC, A					  #Incrementar iterador
+            MOV [DPTR], ACC			  #Guarda el nuevo valor del iterador en cuenta
+next_it:    JMP CTE  
+	          INIT_LOOP
+  
+END_LOOP: 
+charge_a:	  MOV ACC, CTE
+			      A
+			      MOV DPTR, ACC			    #DPTR posición de memoria de A
+			      MOV ACC, [DPTR]			  #Guarda A en ACC
+            MOV A, ACC
+charge_q:   MOV ACC, CTE
+  		      Q
+  	        MOV DPTR, ACC
+  	        MOV ACC, [DPTR]			  #Guarda Q en ACC
+            HALT	
 
 Valores
 Q: 0x00			#Multiplicador
@@ -192,31 +169,43 @@ Instrucciones nuevas:
 XOR: Un or exclusivo que solo ponga 1 si 1, 0 o 0, 1. Guarda el valor en el registro ACC.
 10000xxx XOR ACC, A Lanza una bandera de 1 o 0
 MLSB: (10000000)Accede al bit menos significativo de un registro binario de 8 bits, guardándolo en el registro que se haya pasado a la instrucción.
-10001xxx LSB ACC, A No lanza banderas
+10001xxx MLSB ACC, A No lanza banderas
 LLSB: (00000001) Accede al menos significativo, guardandolo en el ACC
 10101xxx LLSB ACC, A No lanza banderas
 MSB: Accede al bit más significativo de un registro binario de 8 bits, guardándolo en el registro que se haya pasado a la instrucción.
-10010xxx LSB ACC, A No lanza banderas
+10010xxx MSB ACC, A No lanza banderas
 RSHIFT: hace un shift aritmético a la derecha del primer registro y el segundo es el valor que indica el shift arítmetico y lo guarda en el registro ACC.
 10011xxx RSHIFT ACC, A no lanza banderas
 NEG: twos complement :D
 10100xxx NEG ACC no lanza banderas
+MFMOV A, ACC
+10110xxx
+MLSHIFT
+10111xxx
 
 Instrucciones en circuitverse:
 
-XOR:
+XOR: //Funciona
 11000001111110000001111000000 //XOR
-RSHIFT:
-00000111111110000001111000000 //shift a la derecha
+RSHIFT: //Funciona
+00000111111110000000010000000 //shift a la derecha
 01010001111110000001111000000 //suma a y acc
-MLSB:
-00101001111110000001111000000 // A And B con shift a la izquierda
-00000111111110000001111000000 //B con shift a la derecha
-00010011111110000001111000000 //Invertir
-00100001111110000001111000000 //A And B
-LLSB:
+MLSB: //Funciona
+  //TODOS SHIFT A LA IZQ
+00101001111110000000010000000 // A And B con shift a la izquierda
+01101011111110000000010000000 //B+1
+00001011111110000000010000000 //B
+01101011111110000000010000000 //B+1
+00111011111110000000010000000 //A OR B
+00001011111110000000010000000 //B
+01101011111110000000010000000 //B+1
+00100001111110000001111000000 //A AND B
+LLSB: //Funciona
 00100001111110000001111000000 //A and B
-MSB:
+MSB: //Funciona
 00100001111110000001111000000 //A and B
-NEG
-01110011111110000001111000000 //-B
+NEG //FUNCIONA
+00010011111110000000010000000 //INV B
+11100011111110000001111000000 //B+1
+MFMOV A, ACC (SIN BANDERAS)
+00000011101110000001111000000
